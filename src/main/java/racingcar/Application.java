@@ -1,7 +1,9 @@
 package racingcar;
 
 import camp.nextstep.edu.missionutils.Console;
+import camp.nextstep.edu.missionutils.Randoms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,14 +12,57 @@ public class Application {
     private static boolean retry = false;
     private static int retryCnt = 0;
     private static Map<String,String> cars;
+    private static ArrayList<String> answer;
+    private static int max = 0;
 
     public static void main(String[] args) {
         cars = new HashMap<>();
+        answer = new ArrayList<>();
         startRacingGame();
         getValidCarInput();
 
         getTryCount();
         getValidTryCountInput();
+
+        while (retryCnt-- > 0) {
+            moveRacingCar(cars);
+            cars.forEach((key, value) -> System.out.println(key + " : " + value));
+        }
+
+        cars.forEach(Application::getMaxValue);
+        cars.forEach(Application::getAnswer);
+
+        returnAnswer();
+    }
+
+    protected static void returnAnswer() {
+        StringBuilder sb = new StringBuilder();
+        answer.forEach((value) -> sb.append(value).append(", "));
+        String result = sb.substring(0, sb.toString().length()-2);
+
+        System.out.print("최종 우승자 : " + result);
+    }
+
+    protected static void getAnswer(String key, String value) {
+        if (value.length() == max) answer.add(key);
+    }
+
+    protected static void getMaxValue(String key, String value) {
+        if (value.length() > max) max = value.length();
+    }
+
+    protected static void moveRacingCar(Map<String, String> cars) {
+
+        cars.forEach((key, value) -> {
+            int moveOrStay = Randoms.pickNumberInRange(0,9);
+            changeCarStatus(key, moveOrStay);
+        });
+    }
+
+    protected static void changeCarStatus(String key, int moveOrStay) {
+        if (moveOrStay >= 4) {
+            cars.put(key, cars.get(key)+"-");
+        }
     }
 
     protected static void startRacingGame() {
